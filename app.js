@@ -94,7 +94,7 @@ const events = [
 ];
 
 const organizationEmail = "nekonyanz@example.com";
-const defaultGoogleFormUrl = "";
+const defaultGoogleFormUrl = "https://forms.gle/XTmTQbWLNASFjjnEA";
 const storageKey = "nekonyanzRequests";
 const photoStorageKey = "nekonyanzPhotoOverrides";
 const settingsStorageKey = "nekonyanzSettings";
