@@ -539,6 +539,39 @@ textarea:focus {
   padding: 18px;
 }
 
+.admin-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-section {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.admin-section h3 {
+  margin-bottom: 12px;
+}
+
+.admin-settings,
+.photo-settings {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr auto;
+}
+
+.admin-settings label,
+.admin-settings p,
+.photo-settings label:first-child {
+  grid-column: 1 / -1;
+}
+
+.admin-settings p {
+  color: var(--muted);
+  margin: 0;
+}
+
 .admin-login p {
   color: var(--muted);
   margin: 0;
@@ -644,6 +677,11 @@ textarea:focus {
   }
 
   .request-card dl {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-settings,
+  .photo-settings {
     grid-template-columns: 1fr;
   }
 }

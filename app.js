@@ -94,7 +94,10 @@ const events = [
 ];
 
 const organizationEmail = "nekonyanz@example.com";
+const defaultGoogleFormUrl = "";
 const storageKey = "nekonyanzRequests";
+const photoStorageKey = "nekonyanzPhotoOverrides";
+const settingsStorageKey = "nekonyanzSettings";
 const filterForm = document.querySelector("#filterForm");
 const catGrid = document.querySelector("#catGrid");
 const catDetail = document.querySelector("#catDetail");
@@ -114,6 +117,12 @@ const adminLogin = document.querySelector("#adminLogin");
 const adminPanel = document.querySelector("#adminPanel");
 const requestList = document.querySelector("#requestList");
 const requestCount = document.querySelector("#requestCount");
+const googleFormLink = document.querySelector("#googleFormLink");
+const adminSettings = document.querySelector("#adminSettings");
+const googleFormUrl = document.querySelector("#googleFormUrl");
+const photoSettings = document.querySelector("#photoSettings");
+const photoCatSelect = document.querySelector("#photoCatSelect");
+const photoUrl = document.querySelector("#photoUrl");
 
 function careLabel(care) {
   return care.map((item) => item.replace("去勢済", "避妊・去勢済").replace("避妊済", "避妊・去勢済"));
@@ -138,6 +147,41 @@ function getRequests() {
 
 function setRequests(requests) {
   localStorage.setItem(storageKey, JSON.stringify(requests));
+}
+
+function getPhotoOverrides() {
+  return JSON.parse(localStorage.getItem(photoStorageKey) || "{}");
+}
+
+function setPhotoOverrides(overrides) {
+  localStorage.setItem(photoStorageKey, JSON.stringify(overrides));
+}
+
+function getSettings() {
+  return {
+    googleFormUrl: defaultGoogleFormUrl,
+    ...JSON.parse(localStorage.getItem(settingsStorageKey) || "{}")
+  };
+}
+
+function setSettings(settings) {
+  localStorage.setItem(settingsStorageKey, JSON.stringify(settings));
+}
+
+function getCatImage(catId) {
+  return getPhotoOverrides()[catId] || catImages[catId];
+}
+
+function applySettings() {
+  const settings = getSettings();
+  googleFormUrl.value = settings.googleFormUrl || "";
+
+  if (settings.googleFormUrl) {
+    googleFormLink.href = settings.googleFormUrl;
+    googleFormLink.hidden = false;
+  } else {
+    googleFormLink.hidden = true;
+  }
 }
 
 function catMatches(cat) {
@@ -178,7 +222,7 @@ function renderCats() {
     const card = document.createElement("article");
     card.className = "cat-card";
     card.innerHTML = `
-      <img alt="${cat.name}の写真" src="${catImages[cat.id]}">
+      <img alt="${cat.name}の写真" src="${getCatImage(cat.id)}">
       <div class="cat-card-body">
         <div>
           <h3>${cat.name}</h3>
@@ -201,7 +245,7 @@ function renderDetail(catId) {
 
   catDetail.innerHTML = `
     <article class="detail-card">
-      <img alt="${cat.name}の写真" src="${catImages[cat.id]}">
+      <img alt="${cat.name}の写真" src="${getCatImage(cat.id)}">
       <div>
         <p class="eyebrow">Cat Profile</p>
         <h2>${cat.name}</h2>
@@ -256,6 +300,20 @@ function renderRequests() {
   });
 }
 
+function renderPhotoSettings() {
+  photoCatSelect.innerHTML = "";
+  fillSelect(photoCatSelect, cats.map((cat) => `${cat.name}（${cat.breed}）`));
+  [...photoCatSelect.options].forEach((option, index) => {
+    option.value = cats[index].id;
+  });
+  updatePhotoUrlField();
+}
+
+function updatePhotoUrlField() {
+  const overrides = getPhotoOverrides();
+  photoUrl.value = overrides[photoCatSelect.value] || "";
+}
+
 function exportCsv() {
   const requests = getRequests();
   const header = ["受付日時", "猫", "お名前", "メール", "電話", "内容"];
@@ -290,6 +348,8 @@ function setup() {
 
   renderCats();
   renderEvents();
+  renderPhotoSettings();
+  applySettings();
 }
 
 filterForm.addEventListener("input", renderCats);
@@ -323,24 +383,15 @@ interestForm.addEventListener("submit", (event) => {
     createdAt: new Date().toLocaleString("ja-JP")
   };
   setRequests([...getRequests(), request]);
-  const subject = encodeURIComponent(`譲渡希望：${request.catName}`);
-  const body = encodeURIComponent([
-    "猫にゃんズ ご担当者さま",
-    "",
-    "以下の内容で譲渡希望を送ります。",
-    "",
-    `気になる猫：${request.catName}`,
-    `お名前：${request.name}`,
-    `メール：${request.email}`,
-    `電話：${request.phone || "未入力"}`,
-    "",
-    "住まいの環境・希望理由：",
-    request.message
-  ].join("\n"));
   interestForm.reset();
-  formNote.textContent = "内容を保存しました。メール作成画面が開いたら送信してください。公開ページには表示されません。";
   renderRequests();
-  window.location.href = `mailto:${organizationEmail}?subject=${subject}&body=${body}`;
+
+  if (getSettings().googleFormUrl) {
+    formNote.textContent = "デモ用に控えを保存しました。実運用では下のGoogleフォームボタンから送信してください。";
+    return;
+  }
+
+  formNote.textContent = "送信しました。猫にゃんズの管理画面にのみ保存されています。";
 });
 
 document.querySelector("[data-open-admin]").addEventListener("click", () => {
@@ -360,6 +411,40 @@ adminLogin.addEventListener("submit", (event) => {
   adminLogin.hidden = true;
   adminPanel.hidden = false;
   renderRequests();
+  applySettings();
+});
+
+adminSettings.addEventListener("submit", (event) => {
+  event.preventDefault();
+  setSettings({ ...getSettings(), googleFormUrl: googleFormUrl.value.trim() });
+  applySettings();
+  alert("GoogleフォームURLを保存しました。");
+});
+
+photoCatSelect.addEventListener("change", updatePhotoUrlField);
+
+photoSettings.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const url = photoUrl.value.trim();
+  const overrides = getPhotoOverrides();
+  if (url) {
+    overrides[photoCatSelect.value] = url;
+  } else {
+    delete overrides[photoCatSelect.value];
+  }
+  setPhotoOverrides(overrides);
+  renderCats();
+  catDetail.innerHTML = "";
+  alert("写真を更新しました。");
+});
+
+document.querySelector("#resetPhoto").addEventListener("click", () => {
+  const overrides = getPhotoOverrides();
+  delete overrides[photoCatSelect.value];
+  setPhotoOverrides(overrides);
+  updatePhotoUrlField();
+  renderCats();
+  catDetail.innerHTML = "";
 });
 
 document.querySelector("#exportRequests").addEventListener("click", exportCsv);

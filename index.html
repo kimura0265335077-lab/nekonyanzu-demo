@@ -124,7 +124,7 @@
             <p class="eyebrow">Matching</p>
             <h2 id="contact-title">譲渡希望を伝える</h2>
           </div>
-          <p>入力内容は公開ページには表示されません。管理画面で猫にゃんズだけが確認します。</p>
+          <p>入力内容は公開ページには表示されません。実運用では無料のGoogleフォームで猫にゃんズだけが確認します。</p>
         </div>
 
         <form class="interest-form" id="interestForm">
@@ -153,6 +153,7 @@
             <span>個人情報が猫にゃんズの確認用として保存されることに同意します。</span>
           </label>
           <button class="button primary" type="submit">希望を送信</button>
+          <a class="button secondary google-form-link" id="googleFormLink" href="#" target="_blank" rel="noopener" hidden>Googleフォームで送信</a>
           <p class="form-note" id="formNote" role="status"></p>
         </form>
       </section>
@@ -175,6 +176,32 @@
         <p>試作品のパスコードは <strong>demo</strong> です。本運用では無料のサーバーや認証設定が必要です。</p>
       </form>
       <div class="admin-panel" id="adminPanel" hidden>
+        <section class="admin-section">
+          <h3>公開設定</h3>
+          <form class="admin-settings" id="adminSettings">
+            <label>
+              <span>GoogleフォームURL</span>
+              <input id="googleFormUrl" type="url" placeholder="https://forms.gle/...">
+            </label>
+            <button class="button primary" type="submit">フォームURLを保存</button>
+            <p>希望者の個人情報はGoogleフォームに集めると、公開サイト上には残りません。</p>
+          </form>
+        </section>
+        <section class="admin-section">
+          <h3>猫の写真更新</h3>
+          <form class="photo-settings" id="photoSettings">
+            <label>
+              <span>更新する猫</span>
+              <select id="photoCatSelect"></select>
+            </label>
+            <label>
+              <span>写真URL</span>
+              <input id="photoUrl" type="url" placeholder="https://...jpg または https://...png">
+            </label>
+            <button class="button primary" type="submit">写真を更新</button>
+            <button class="button secondary" type="button" id="resetPhoto">標準写真に戻す</button>
+          </form>
+        </section>
         <div class="admin-toolbar">
           <strong id="requestCount">0件の希望</strong>
           <button class="button secondary" type="button" id="exportRequests">CSV出力</button>
