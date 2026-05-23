@@ -474,12 +474,16 @@ textarea:focus {
   grid-template-columns: repeat(2, 1fr);
 }
 
-.interest-form label:first-child,
-.interest-form label:nth-child(5),
+.interest-copy,
 .check-row,
 .form-note,
-.interest-form button {
+.interest-form .button {
   grid-column: 1 / -1;
+}
+
+.interest-copy {
+  color: var(--muted);
+  margin: 0;
 }
 
 .check-row {
@@ -668,11 +672,10 @@ textarea:focus {
   }
 
   .search-field,
-  .interest-form label:first-child,
-  .interest-form label:nth-child(5),
+  .interest-copy,
   .check-row,
   .form-note,
-  .interest-form button {
+  .interest-form .button {
     grid-column: auto;
   }
 

@@ -127,35 +127,11 @@
           <p>入力内容は公開ページには表示されません。実運用では無料のGoogleフォームで猫にゃんズだけが確認します。</p>
         </div>
 
-        <form class="interest-form" id="interestForm">
-          <label>
-            <span>気になる猫</span>
-            <select id="catSelect" required></select>
-          </label>
-          <label>
-            <span>お名前</span>
-            <input name="name" autocomplete="name" required>
-          </label>
-          <label>
-            <span>メールアドレス</span>
-            <input name="email" type="email" autocomplete="email" required>
-          </label>
-          <label>
-            <span>電話番号</span>
-            <input name="phone" type="tel" autocomplete="tel">
-          </label>
-          <label>
-            <span>住まいの環境・希望理由</span>
-            <textarea name="message" rows="5" required placeholder="例：家族構成、先住猫の有無、希望する理由など"></textarea>
-          </label>
-          <label class="check-row">
-            <input type="checkbox" required>
-            <span>個人情報が猫にゃんズの確認用として保存されることに同意します。</span>
-          </label>
-          <button class="button primary" type="submit">希望を送信</button>
-          <a class="button secondary google-form-link" id="googleFormLink" href="#" target="_blank" rel="noopener" hidden>Googleフォームで送信</a>
+        <div class="interest-form" id="interestForm">
+          <p class="interest-copy">譲渡希望、見学相談、質問はGoogleフォームから送信してください。回答内容は猫にゃんズだけが確認します。</p>
+          <a class="button primary google-form-link" id="googleFormLink" href="#" target="_blank" rel="noopener">Googleフォームで送信</a>
           <p class="form-note" id="formNote" role="status"></p>
-        </form>
+        </div>
       </section>
     </main>
 

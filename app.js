@@ -108,8 +108,6 @@ const careFilter = document.querySelector("#careFilter");
 const keywordFilter = document.querySelector("#keywordFilter");
 const resultCount = document.querySelector("#resultCount");
 const catCount = document.querySelector("#catCount");
-const catSelect = document.querySelector("#catSelect");
-const interestForm = document.querySelector("#interestForm");
 const formNote = document.querySelector("#formNote");
 const eventList = document.querySelector("#eventList");
 const adminDialog = document.querySelector("#adminDialog");
@@ -181,6 +179,7 @@ function applySettings() {
     googleFormLink.hidden = false;
   } else {
     googleFormLink.hidden = true;
+    formNote.textContent = "GoogleフォームURLが未設定です。管理画面でフォームURLを保存してください。";
   }
 }
 
@@ -341,10 +340,6 @@ function setup() {
   catCount.textContent = cats.length;
   fillSelect(breedFilter, unique(cats.map((cat) => cat.breed)));
   fillSelect(traitFilter, unique(cats.flatMap((cat) => cat.traits)));
-  fillSelect(catSelect, cats.map((cat) => `${cat.name}（${cat.age} / ${cat.breed}）`));
-  [...catSelect.options].forEach((option, index) => {
-    option.value = cats[index].id;
-  });
 
   renderCats();
   renderEvents();
@@ -365,33 +360,7 @@ catGrid.addEventListener("click", (event) => {
 catDetail.addEventListener("click", (event) => {
   const button = event.target.closest("[data-interest]");
   if (!button) return;
-  catSelect.value = button.dataset.interest;
   document.querySelector("#contact").scrollIntoView({ behavior: "smooth" });
-});
-
-interestForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const formData = new FormData(interestForm);
-  const selectedCat = cats.find((cat) => cat.id === catSelect.value);
-  const request = {
-    catId: selectedCat.id,
-    catName: selectedCat.name,
-    name: formData.get("name").trim(),
-    email: formData.get("email").trim(),
-    phone: formData.get("phone").trim(),
-    message: formData.get("message").trim(),
-    createdAt: new Date().toLocaleString("ja-JP")
-  };
-  setRequests([...getRequests(), request]);
-  interestForm.reset();
-  renderRequests();
-
-  if (getSettings().googleFormUrl) {
-    formNote.textContent = "デモ用に控えを保存しました。実運用では下のGoogleフォームボタンから送信してください。";
-    return;
-  }
-
-  formNote.textContent = "送信しました。猫にゃんズの管理画面にのみ保存されています。";
 });
 
 document.querySelector("[data-open-admin]").addEventListener("click", () => {
