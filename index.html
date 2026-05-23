@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>猫にゃんズ | 保護猫譲渡サポート</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="#top" aria-label="猫にゃんズ ホーム">
+          <span class="brand-mark">猫</span>
+          <span>
+            <strong>猫にゃんズ</strong>
+            <small>保護猫と家族をつなぐ</small>
+          </span>
+        </a>
+        <nav class="nav" aria-label="主要メニュー">
+          <a href="#cats">保護猫</a>
+          <a href="#events">譲渡会</a>
+          <a href="#contact">希望を伝える</a>
+          <button class="admin-open" type="button" data-open-admin>管理</button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-photo" aria-hidden="true">
+          <div class="photo-grid">
+            <img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 520'%3E%3Crect width='720' height='520' fill='%23f4ead8'/%3E%3Ccircle cx='356' cy='285' r='152' fill='%23d2875f'/%3E%3Cpath d='M220 205 276 84l72 94M496 205 438 84l-72 94' fill='%23d2875f'/%3E%3Ccircle cx='305' cy='270' r='16' fill='%232a2520'/%3E%3Ccircle cx='411' cy='270' r='16' fill='%232a2520'/%3E%3Cpath d='M351 311h18l-9 12z' fill='%23885342'/%3E%3Cpath d='M325 347c21 20 49 20 70 0' fill='none' stroke='%232a2520' stroke-width='9' stroke-linecap='round'/%3E%3Cpath d='M138 306c53-15 99-15 143 0M137 357c57-7 103 0 144 20M582 306c-53-15-99-15-143 0M583 357c-57-7-103 0-144 20' stroke='%232a2520' stroke-width='8' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+            <img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 520'%3E%3Crect width='720' height='520' fill='%23dbe7df'/%3E%3Ccircle cx='360' cy='278' r='150' fill='%238a9496'/%3E%3Cpath d='M222 200 275 83l75 91M498 200 445 83l-75 91' fill='%238a9496'/%3E%3Cpath d='M278 252c20-18 43-18 62 0M380 252c20-18 43-18 62 0' fill='none' stroke='%23222528' stroke-width='11' stroke-linecap='round'/%3E%3Cpath d='M350 312h20l-10 14z' fill='%23c27370'/%3E%3Cpath d='M329 353c19 16 43 16 62 0' fill='none' stroke='%23222528' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E">
+            <img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 520'%3E%3Crect width='720' height='520' fill='%23f1dfdf'/%3E%3Ccircle cx='360' cy='280' r='154' fill='%23faf7f0'/%3E%3Cpath d='M219 207 278 86l69 94M501 207 442 86l-69 94' fill='%23faf7f0'/%3E%3Ccircle cx='306' cy='269' r='17' fill='%231b1b1c'/%3E%3Ccircle cx='414' cy='269' r='17' fill='%231b1b1c'/%3E%3Cpath d='M279 204c48-27 100-18 126 18 26-36 76-45 126-18' fill='none' stroke='%23c98b61' stroke-width='24' stroke-linecap='round' opacity='.8'/%3E%3Cpath d='M350 315h20l-10 14z' fill='%23c86a6a'/%3E%3Cpath d='M325 352c23 19 47 19 70 0' fill='none' stroke='%231b1b1c' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E">
+          </div>
+        </div>
+        <div class="hero-copy">
+          <p class="eyebrow">譲渡につながる情報を、やさしく整理</p>
+          <h1 id="hero-title">猫にゃんズ</h1>
+          <p>名前、年齢、性格、医療状況、写真、譲渡会情報をひとつにまとめ、希望者が気になる子へ安心して問い合わせできる無料運用向けアプリです。</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#cats">保護猫を見る</a>
+            <a class="button secondary" href="#events">譲渡会を確認</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats" aria-label="公開情報の概要">
+        <div><strong id="catCount">0</strong><span>掲載中</span></div>
+        <div><strong>0円</strong><span>外部サービス費用</span></div>
+        <div><strong>非公開</strong><span>希望者の個人情報</span></div>
+      </section>
+
+      <section class="section" id="cats" aria-labelledby="cats-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Adoption</p>
+            <h2 id="cats-title">保護猫を探す</h2>
+          </div>
+          <p>種類・性別・特徴・処置状況で絞り込みできます。</p>
+        </div>
+
+        <form class="filters" id="filterForm" aria-label="保護猫検索">
+          <label>
+            <span>猫の種類</span>
+            <select id="breedFilter">
+              <option value="">すべて</option>
+            </select>
+          </label>
+          <label>
+            <span>性別</span>
+            <select id="genderFilter">
+              <option value="">すべて</option>
+              <option value="女の子">女の子</option>
+              <option value="男の子">男の子</option>
+            </select>
+          </label>
+          <label>
+            <span>特徴</span>
+            <select id="traitFilter">
+              <option value="">すべて</option>
+            </select>
+          </label>
+          <label>
+            <span>処置の状況</span>
+            <select id="careFilter">
+              <option value="">すべて</option>
+              <option value="避妊・去勢済">避妊・去勢済</option>
+              <option value="ワクチン済">ワクチン済</option>
+              <option value="検査済">検査済</option>
+              <option value="治療中">治療中</option>
+            </select>
+          </label>
+          <label class="search-field">
+            <span>名前・キーワード</span>
+            <input id="keywordFilter" type="search" placeholder="例：甘えん坊、茶トラ">
+          </label>
+          <button class="button secondary" type="reset">条件をクリア</button>
+        </form>
+
+        <div class="result-bar">
+          <strong id="resultCount">0件</strong>
+          <span>条件に合う猫</span>
+        </div>
+        <div class="cat-grid" id="catGrid"></div>
+      </section>
+
+      <section class="section detail-section" id="catDetail" aria-live="polite"></section>
+
+      <section class="section" id="events" aria-labelledby="events-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Events</p>
+            <h2 id="events-title">譲渡会情報</h2>
+          </div>
+          <p>開催日時、会場、予約の目安を掲載できます。</p>
+        </div>
+        <div class="event-list" id="eventList"></div>
+      </section>
+
+      <section class="section contact-section" id="contact" aria-labelledby="contact-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Matching</p>
+            <h2 id="contact-title">譲渡希望を伝える</h2>
+          </div>
+          <p>入力内容は公開ページには表示されません。管理画面で猫にゃんズだけが確認します。</p>
+        </div>
+
+        <form class="interest-form" id="interestForm">
+          <label>
+            <span>気になる猫</span>
+            <select id="catSelect" required></select>
+          </label>
+          <label>
+            <span>お名前</span>
+            <input name="name" autocomplete="name" required>
+          </label>
+          <label>
+            <span>メールアドレス</span>
+            <input name="email" type="email" autocomplete="email" required>
+          </label>
+          <label>
+            <span>電話番号</span>
+            <input name="phone" type="tel" autocomplete="tel">
+          </label>
+          <label>
+            <span>住まいの環境・希望理由</span>
+            <textarea name="message" rows="5" required placeholder="例：家族構成、先住猫の有無、希望する理由など"></textarea>
+          </label>
+          <label class="check-row">
+            <input type="checkbox" required>
+            <span>個人情報が猫にゃんズの確認用として保存されることに同意します。</span>
+          </label>
+          <button class="button primary" type="submit">希望を送信</button>
+          <p class="form-note" id="formNote" role="status"></p>
+        </form>
+      </section>
+    </main>
+
+    <dialog class="admin-dialog" id="adminDialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Private</p>
+          <h2>猫にゃんズ管理画面</h2>
+        </div>
+        <button class="icon-button" type="button" data-close-admin aria-label="閉じる">×</button>
+      </div>
+      <form class="admin-login" id="adminLogin">
+        <label>
+          <span>管理用パスコード</span>
+          <input id="adminPass" type="password" placeholder="demo">
+        </label>
+        <button class="button primary" type="submit">確認する</button>
+        <p>試作品のパスコードは <strong>demo</strong> です。本運用では無料のサーバーや認証設定が必要です。</p>
+      </form>
+      <div class="admin-panel" id="adminPanel" hidden>
+        <div class="admin-toolbar">
+          <strong id="requestCount">0件の希望</strong>
+          <button class="button secondary" type="button" id="exportRequests">CSV出力</button>
+        </div>
+        <div class="request-list" id="requestList"></div>
+      </div>
+    </dialog>
+
+    <footer class="footer">
+      <p>猫にゃんズ | この試作品は無料運用を想定した静的ウェブアプリです。</p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
