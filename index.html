@@ -171,11 +171,60 @@
               <select id="photoCatSelect"></select>
             </label>
             <label>
-              <span>写真URL</span>
-              <input id="photoUrl" type="url" placeholder="https://...jpg または https://...png">
+              <span>写真ファイル</span>
+              <input id="photoFile" type="file" accept="image/*">
             </label>
+            <img class="admin-photo-preview" id="photoPreview" alt="選択中の猫の写真プレビュー">
             <button class="button primary" type="submit">写真を更新</button>
             <button class="button secondary" type="button" id="resetPhoto">標準写真に戻す</button>
+            <p class="admin-note">選択した写真はこのブラウザのデモ表示に保存されます。</p>
+          </form>
+        </section>
+        <section class="admin-section">
+          <h3>猫のプロフィール編集</h3>
+          <form class="profile-settings" id="profileSettings">
+            <label>
+              <span>編集する猫</span>
+              <select id="profileCatSelect"></select>
+            </label>
+            <label>
+              <span>名前</span>
+              <input id="profileName" required>
+            </label>
+            <label>
+              <span>年齢</span>
+              <input id="profileAge" required>
+            </label>
+            <label>
+              <span>猫の種類</span>
+              <input id="profileBreed" required>
+            </label>
+            <label>
+              <span>性別</span>
+              <select id="profileGender" required>
+                <option value="女の子">女の子</option>
+                <option value="男の子">男の子</option>
+              </select>
+            </label>
+            <label>
+              <span>特徴（読点で区切る）</span>
+              <input id="profileTraits" placeholder="甘えん坊、初心者向き">
+            </label>
+            <label>
+              <span>病気の有無</span>
+              <input id="profileDisease" placeholder="なし / 治療中など">
+            </label>
+            <label>
+              <span>処置状況（読点で区切る）</span>
+              <input id="profileCare" placeholder="避妊済、ワクチン済、検査済">
+            </label>
+            <label>
+              <span>紹介文</span>
+              <textarea id="profileNote" rows="4"></textarea>
+            </label>
+            <button class="button primary" type="submit">プロフィールを保存</button>
+            <button class="button secondary" type="button" id="resetProfile">標準プロフィールに戻す</button>
+            <p class="admin-note">プロフィール変更もこのブラウザのデモ表示に保存されます。</p>
           </form>
         </section>
         <div class="admin-toolbar">

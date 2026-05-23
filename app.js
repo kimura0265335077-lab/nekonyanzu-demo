@@ -97,6 +97,7 @@ const organizationEmail = "nekonyanz@example.com";
 const defaultGoogleFormUrl = "https://forms.gle/XTmTQbWLNASFjjnEA";
 const storageKey = "nekonyanzRequests";
 const photoStorageKey = "nekonyanzPhotoOverrides";
+const profileStorageKey = "nekonyanzProfileOverrides";
 const settingsStorageKey = "nekonyanzSettings";
 const filterForm = document.querySelector("#filterForm");
 const catGrid = document.querySelector("#catGrid");
@@ -120,7 +121,18 @@ const adminSettings = document.querySelector("#adminSettings");
 const googleFormUrl = document.querySelector("#googleFormUrl");
 const photoSettings = document.querySelector("#photoSettings");
 const photoCatSelect = document.querySelector("#photoCatSelect");
-const photoUrl = document.querySelector("#photoUrl");
+const photoFile = document.querySelector("#photoFile");
+const photoPreview = document.querySelector("#photoPreview");
+const profileSettings = document.querySelector("#profileSettings");
+const profileCatSelect = document.querySelector("#profileCatSelect");
+const profileName = document.querySelector("#profileName");
+const profileAge = document.querySelector("#profileAge");
+const profileBreed = document.querySelector("#profileBreed");
+const profileGender = document.querySelector("#profileGender");
+const profileTraits = document.querySelector("#profileTraits");
+const profileDisease = document.querySelector("#profileDisease");
+const profileCare = document.querySelector("#profileCare");
+const profileNote = document.querySelector("#profileNote");
 
 function careLabel(care) {
   return care.map((item) => item.replace("去勢済", "避妊・去勢済").replace("避妊済", "避妊・去勢済"));
@@ -139,6 +151,13 @@ function fillSelect(select, values) {
   });
 }
 
+function parseList(value) {
+  return value
+    .split(/[、,]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 function getRequests() {
   return JSON.parse(localStorage.getItem(storageKey) || "[]");
 }
@@ -153,6 +172,23 @@ function getPhotoOverrides() {
 
 function setPhotoOverrides(overrides) {
   localStorage.setItem(photoStorageKey, JSON.stringify(overrides));
+}
+
+function getProfileOverrides() {
+  return JSON.parse(localStorage.getItem(profileStorageKey) || "{}");
+}
+
+function setProfileOverrides(overrides) {
+  localStorage.setItem(profileStorageKey, JSON.stringify(overrides));
+}
+
+function applyProfileOverrides() {
+  const overrides = getProfileOverrides();
+  cats.forEach((cat) => {
+    if (overrides[cat.id]) {
+      Object.assign(cat, overrides[cat.id]);
+    }
+  });
 }
 
 function getSettings() {
@@ -305,12 +341,71 @@ function renderPhotoSettings() {
   [...photoCatSelect.options].forEach((option, index) => {
     option.value = cats[index].id;
   });
-  updatePhotoUrlField();
+  updatePhotoPreview();
 }
 
-function updatePhotoUrlField() {
-  const overrides = getPhotoOverrides();
-  photoUrl.value = overrides[photoCatSelect.value] || "";
+function updatePhotoPreview() {
+  photoPreview.src = getCatImage(photoCatSelect.value);
+  photoFile.value = "";
+}
+
+function renderProfileSettings() {
+  profileCatSelect.innerHTML = "";
+  fillSelect(profileCatSelect, cats.map((cat) => `${cat.name}（${cat.breed}）`));
+  [...profileCatSelect.options].forEach((option, index) => {
+    option.value = cats[index].id;
+  });
+  updateProfileFields();
+}
+
+function updateProfileFields() {
+  const cat = cats.find((item) => item.id === profileCatSelect.value);
+  if (!cat) return;
+  profileName.value = cat.name;
+  profileAge.value = cat.age;
+  profileBreed.value = cat.breed;
+  profileGender.value = cat.gender;
+  profileTraits.value = cat.traits.join("、");
+  profileDisease.value = cat.disease;
+  profileCare.value = cat.care.join("、");
+  profileNote.value = cat.note;
+}
+
+function refreshFilterOptions() {
+  const selectedBreed = breedFilter.value;
+  const selectedTrait = traitFilter.value;
+  breedFilter.innerHTML = '<option value="">すべて</option>';
+  traitFilter.innerHTML = '<option value="">すべて</option>';
+  fillSelect(breedFilter, unique(cats.map((cat) => cat.breed)));
+  fillSelect(traitFilter, unique(cats.flatMap((cat) => cat.traits)));
+  breedFilter.value = [...breedFilter.options].some((option) => option.value === selectedBreed) ? selectedBreed : "";
+  traitFilter.value = [...traitFilter.options].some((option) => option.value === selectedTrait) ? selectedTrait : "";
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const url = URL.createObjectURL(file);
+
+    image.addEventListener("load", () => {
+      const maxSize = 1200;
+      const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(image.width * scale);
+      canvas.height = Math.round(image.height * scale);
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/jpeg", 0.82));
+    });
+
+    image.addEventListener("error", () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("画像を読み込めませんでした。"));
+    });
+
+    image.src = url;
+  });
 }
 
 function exportCsv() {
@@ -337,13 +432,14 @@ function exportCsv() {
 }
 
 function setup() {
+  applyProfileOverrides();
   catCount.textContent = cats.length;
-  fillSelect(breedFilter, unique(cats.map((cat) => cat.breed)));
-  fillSelect(traitFilter, unique(cats.flatMap((cat) => cat.traits)));
+  refreshFilterOptions();
 
   renderCats();
   renderEvents();
   renderPhotoSettings();
+  renderProfileSettings();
   applySettings();
 }
 
@@ -390,18 +486,26 @@ adminSettings.addEventListener("submit", (event) => {
   alert("GoogleフォームURLを保存しました。");
 });
 
-photoCatSelect.addEventListener("change", updatePhotoUrlField);
+photoCatSelect.addEventListener("change", updatePhotoPreview);
 
-photoSettings.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const url = photoUrl.value.trim();
-  const overrides = getPhotoOverrides();
-  if (url) {
-    overrides[photoCatSelect.value] = url;
-  } else {
-    delete overrides[photoCatSelect.value];
+photoFile.addEventListener("change", () => {
+  const file = photoFile.files[0];
+  if (file) {
+    photoPreview.src = URL.createObjectURL(file);
   }
+});
+
+photoSettings.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const file = photoFile.files[0];
+  if (!file) {
+    alert("写真ファイルを選んでください。");
+    return;
+  }
+  const overrides = getPhotoOverrides();
+  overrides[photoCatSelect.value] = await fileToDataUrl(file);
   setPhotoOverrides(overrides);
+  updatePhotoPreview();
   renderCats();
   catDetail.innerHTML = "";
   alert("写真を更新しました。");
@@ -411,9 +515,48 @@ document.querySelector("#resetPhoto").addEventListener("click", () => {
   const overrides = getPhotoOverrides();
   delete overrides[photoCatSelect.value];
   setPhotoOverrides(overrides);
-  updatePhotoUrlField();
+  updatePhotoPreview();
   renderCats();
   catDetail.innerHTML = "";
+});
+
+profileCatSelect.addEventListener("change", updateProfileFields);
+
+profileSettings.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const cat = cats.find((item) => item.id === profileCatSelect.value);
+  if (!cat) return;
+
+  const updatedCat = {
+    ...cat,
+    name: profileName.value.trim(),
+    age: profileAge.value.trim(),
+    breed: profileBreed.value.trim(),
+    gender: profileGender.value,
+    traits: parseList(profileTraits.value),
+    disease: profileDisease.value.trim() || "なし",
+    care: parseList(profileCare.value),
+    note: profileNote.value.trim()
+  };
+  Object.assign(cat, updatedCat);
+
+  const overrides = getProfileOverrides();
+  overrides[cat.id] = updatedCat;
+  setProfileOverrides(overrides);
+
+  refreshFilterOptions();
+  renderCats();
+  renderPhotoSettings();
+  renderProfileSettings();
+  catDetail.innerHTML = "";
+  alert("プロフィールを保存しました。");
+});
+
+document.querySelector("#resetProfile").addEventListener("click", () => {
+  const overrides = getProfileOverrides();
+  delete overrides[profileCatSelect.value];
+  setProfileOverrides(overrides);
+  window.location.reload();
 });
 
 document.querySelector("#exportRequests").addEventListener("click", exportCsv);

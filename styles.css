@@ -559,7 +559,8 @@ textarea:focus {
 }
 
 .admin-settings,
-.photo-settings {
+.photo-settings,
+.profile-settings {
   display: grid;
   gap: 12px;
   grid-template-columns: 1fr auto;
@@ -567,13 +568,31 @@ textarea:focus {
 
 .admin-settings label,
 .admin-settings p,
-.photo-settings label:first-child {
+.photo-settings label:first-child,
+.profile-settings label:first-child,
+.profile-settings label:nth-child(8),
+.profile-settings label:nth-child(9) {
   grid-column: 1 / -1;
 }
 
 .admin-settings p {
   color: var(--muted);
   margin: 0;
+}
+
+.admin-note {
+  color: var(--muted);
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.admin-photo-preview {
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  grid-column: 1 / -1;
+  max-height: 220px;
+  object-fit: cover;
 }
 
 .admin-login p {
@@ -684,7 +703,8 @@ textarea:focus {
   }
 
   .admin-settings,
-  .photo-settings {
+  .photo-settings,
+  .profile-settings {
     grid-template-columns: 1fr;
   }
 }
