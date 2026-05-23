@@ -7,7 +7,7 @@ const catImages = {
   rin: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 540'%3E%3Crect width='720' height='540' fill='%23ece1d4'/%3E%3Ccircle cx='360' cy='294' r='158' fill='%239c8974'/%3E%3Cpath d='M218 220 279 82l78 116M502 220 441 82l-78 116' fill='%239c8974'/%3E%3Cpath d='M266 220h188M251 270h218M280 340h160' fill='none' stroke='%23705d4b' stroke-width='20' stroke-linecap='round' opacity='.6'/%3E%3Ccircle cx='304' cy='276' r='17' fill='%231d2020'/%3E%3Ccircle cx='416' cy='276' r='17' fill='%231d2020'/%3E%3Cpath d='M348 316h24l-12 18z' fill='%23c77878'/%3E%3Cpath d='M325 360c22 18 48 18 70 0' fill='none' stroke='%231d2020' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E"
 };
 
-const cats = [
+const defaultCats = [
   {
     id: "mugi",
     name: "むぎ",
@@ -99,6 +99,8 @@ const storageKey = "nekonyanzRequests";
 const photoStorageKey = "nekonyanzPhotoOverrides";
 const profileStorageKey = "nekonyanzProfileOverrides";
 const settingsStorageKey = "nekonyanzSettings";
+const catStorageKey = "nekonyanzCats";
+let cats = JSON.parse(localStorage.getItem(catStorageKey) || JSON.stringify(defaultCats));
 const filterForm = document.querySelector("#filterForm");
 const catGrid = document.querySelector("#catGrid");
 const catDetail = document.querySelector("#catDetail");
@@ -133,6 +135,9 @@ const profileTraits = document.querySelector("#profileTraits");
 const profileDisease = document.querySelector("#profileDisease");
 const profileCare = document.querySelector("#profileCare");
 const profileNote = document.querySelector("#profileNote");
+const newProfile = document.querySelector("#newProfile");
+const deleteProfile = document.querySelector("#deleteProfile");
+const resetProfile = document.querySelector("#resetProfile");
 
 function careLabel(care) {
   return care.map((item) => item.replace("去勢済", "避妊・去勢済").replace("避妊済", "避妊・去勢済"));
@@ -156,6 +161,14 @@ function parseList(value) {
     .split(/[、,]/)
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function saveCats() {
+  localStorage.setItem(catStorageKey, JSON.stringify(cats));
+}
+
+function createCatId() {
+  return `cat-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 function getRequests() {
@@ -189,6 +202,10 @@ function applyProfileOverrides() {
       Object.assign(cat, overrides[cat.id]);
     }
   });
+  if (Object.keys(overrides).length) {
+    saveCats();
+    localStorage.removeItem(profileStorageKey);
+  }
 }
 
 function getSettings() {
@@ -203,7 +220,7 @@ function setSettings(settings) {
 }
 
 function getCatImage(catId) {
-  return getPhotoOverrides()[catId] || catImages[catId];
+  return getPhotoOverrides()[catId] || catImages[catId] || catImages.mugi;
 }
 
 function applySettings() {
@@ -244,6 +261,7 @@ function catMatches(cat) {
 }
 
 function renderCats() {
+  catCount.textContent = cats.length;
   const filtered = cats.filter(catMatches);
   catGrid.innerHTML = "";
   resultCount.textContent = `${filtered.length}件`;
@@ -336,29 +354,42 @@ function renderRequests() {
 }
 
 function renderPhotoSettings() {
+  const selected = photoCatSelect.value;
   photoCatSelect.innerHTML = "";
   fillSelect(photoCatSelect, cats.map((cat) => `${cat.name}（${cat.breed}）`));
   [...photoCatSelect.options].forEach((option, index) => {
     option.value = cats[index].id;
   });
+  if ([...photoCatSelect.options].some((option) => option.value === selected)) {
+    photoCatSelect.value = selected;
+  }
   updatePhotoPreview();
 }
 
 function updatePhotoPreview() {
+  if (!photoCatSelect.value) {
+    photoPreview.removeAttribute("src");
+    return;
+  }
   photoPreview.src = getCatImage(photoCatSelect.value);
   photoFile.value = "";
 }
 
 function renderProfileSettings() {
+  const selected = profileCatSelect.value;
   profileCatSelect.innerHTML = "";
   fillSelect(profileCatSelect, cats.map((cat) => `${cat.name}（${cat.breed}）`));
   [...profileCatSelect.options].forEach((option, index) => {
     option.value = cats[index].id;
   });
+  if ([...profileCatSelect.options].some((option) => option.value === selected)) {
+    profileCatSelect.value = selected;
+  }
   updateProfileFields();
 }
 
 function updateProfileFields() {
+  profileSettings.dataset.mode = "edit";
   const cat = cats.find((item) => item.id === profileCatSelect.value);
   if (!cat) return;
   profileName.value = cat.name;
@@ -369,6 +400,35 @@ function updateProfileFields() {
   profileDisease.value = cat.disease;
   profileCare.value = cat.care.join("、");
   profileNote.value = cat.note;
+}
+
+function clearProfileFields() {
+  profileSettings.dataset.mode = "new";
+  profileCatSelect.value = "";
+  profileName.value = "";
+  profileAge.value = "";
+  profileBreed.value = "";
+  profileGender.value = "女の子";
+  profileTraits.value = "";
+  profileDisease.value = "なし";
+  profileCare.value = "ワクチン済、検査済";
+  profileNote.value = "";
+  profileName.focus();
+}
+
+function refreshAdminCatControls(selectedId = "") {
+  renderPhotoSettings();
+  renderProfileSettings();
+  if (selectedId) {
+    if ([...photoCatSelect.options].some((option) => option.value === selectedId)) {
+      photoCatSelect.value = selectedId;
+      updatePhotoPreview();
+    }
+    if ([...profileCatSelect.options].some((option) => option.value === selectedId)) {
+      profileCatSelect.value = selectedId;
+      updateProfileFields();
+    }
+  }
 }
 
 function refreshFilterOptions() {
@@ -497,6 +557,10 @@ photoFile.addEventListener("change", () => {
 
 photoSettings.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (!photoCatSelect.value) {
+    alert("写真を更新する猫を選んでください。");
+    return;
+  }
   const file = photoFile.files[0];
   if (!file) {
     alert("写真ファイルを選んでください。");
@@ -524,7 +588,10 @@ profileCatSelect.addEventListener("change", updateProfileFields);
 
 profileSettings.addEventListener("submit", (event) => {
   event.preventDefault();
-  const cat = cats.find((item) => item.id === profileCatSelect.value);
+  const isNew = profileSettings.dataset.mode === "new" || !profileCatSelect.value;
+  const cat = isNew
+    ? { id: createCatId() }
+    : cats.find((item) => item.id === profileCatSelect.value);
   if (!cat) return;
 
   const updatedCat = {
@@ -538,25 +605,61 @@ profileSettings.addEventListener("submit", (event) => {
     care: parseList(profileCare.value),
     note: profileNote.value.trim()
   };
-  Object.assign(cat, updatedCat);
 
-  const overrides = getProfileOverrides();
-  overrides[cat.id] = updatedCat;
-  setProfileOverrides(overrides);
+  if (!updatedCat.name || !updatedCat.age || !updatedCat.breed) {
+    alert("名前、年齢、猫の種類を入力してください。");
+    return;
+  }
+
+  if (isNew) {
+    cats.push(updatedCat);
+  } else {
+    const index = cats.findIndex((item) => item.id === cat.id);
+    cats[index] = updatedCat;
+  }
+  saveCats();
 
   refreshFilterOptions();
   renderCats();
-  renderPhotoSettings();
-  renderProfileSettings();
+  refreshAdminCatControls(updatedCat.id);
   catDetail.innerHTML = "";
-  alert("プロフィールを保存しました。");
+  alert(isNew ? "新しい猫を登録しました。" : "プロフィールを保存しました。");
 });
 
-document.querySelector("#resetProfile").addEventListener("click", () => {
-  const overrides = getProfileOverrides();
-  delete overrides[profileCatSelect.value];
-  setProfileOverrides(overrides);
-  window.location.reload();
+newProfile.addEventListener("click", clearProfileFields);
+
+deleteProfile.addEventListener("click", () => {
+  const cat = cats.find((item) => item.id === profileCatSelect.value);
+  if (!cat) {
+    alert("削除する猫を選んでください。");
+    return;
+  }
+  if (!confirm(`${cat.name}を削除しますか？`)) return;
+
+  cats = cats.filter((item) => item.id !== cat.id);
+  saveCats();
+
+  const photoOverrides = getPhotoOverrides();
+  delete photoOverrides[cat.id];
+  setPhotoOverrides(photoOverrides);
+
+  refreshFilterOptions();
+  renderCats();
+  refreshAdminCatControls(cats[0]?.id || "");
+  catDetail.innerHTML = "";
+  alert("削除しました。");
+});
+
+resetProfile.addEventListener("click", () => {
+  if (!confirm("猫のプロフィールを初期状態に戻しますか？追加した猫も消えます。")) return;
+  cats = JSON.parse(JSON.stringify(defaultCats));
+  saveCats();
+  localStorage.removeItem(profileStorageKey);
+  refreshFilterOptions();
+  renderCats();
+  refreshAdminCatControls(cats[0]?.id || "");
+  catDetail.innerHTML = "";
+  alert("初期状態に戻しました。");
 });
 
 document.querySelector("#exportRequests").addEventListener("click", exportCsv);

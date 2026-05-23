@@ -234,6 +234,16 @@ h3 {
   border-color: var(--accent);
 }
 
+.button.danger {
+  background: #fff;
+  border-color: #e5b8b8;
+  color: #a93838;
+}
+
+.button.danger:hover {
+  background: #fff4f4;
+}
+
 .stats {
   background: var(--accent-dark);
   color: #fff;
@@ -571,7 +581,8 @@ textarea:focus {
 .photo-settings label:first-child,
 .profile-settings label:first-child,
 .profile-settings label:nth-child(8),
-.profile-settings label:nth-child(9) {
+.profile-settings label:nth-child(9),
+.profile-settings .admin-note {
   grid-column: 1 / -1;
 }
 
